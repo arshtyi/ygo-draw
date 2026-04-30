@@ -1,0 +1,13 @@
+# Runtime caches and downloaded resources
+.cache/
+assets/
+exports/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# .NET build output
+bin/
+obj/

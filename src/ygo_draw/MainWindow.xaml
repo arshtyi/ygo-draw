@@ -1,0 +1,161 @@
+<Window x:Class="ygo_draw.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        xmlns:models="clr-namespace:ygo_draw.models"
+        Title="ygo draw"
+        Width="1320"
+        Height="860"
+        MinWidth="900"
+        MinHeight="720"
+        Closed="Window_Closed"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        Loaded="Window_Loaded">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="12" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" LastChildFill="True">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <Button Content="关于" Width="82" Margin="8,0,0,0" Click="AboutButton_Click" />
+                <Button Content="下载" Width="82" Margin="8,0,0,0" Click="DownloadButton_Click" />
+                <Button Content="清理" Width="82" Margin="8,0,0,0" Click="CleanButton_Click" />
+                <Button Content="导出" Width="82" Margin="8,0,0,0" Click="ExportButton_Click" />
+            </StackPanel>
+            <TextBox x:Name="SearchBox"
+                     FontSize="15"
+                     VerticalContentAlignment="Center"
+                     TextChanged="SearchBox_TextChanged" />
+        </DockPanel>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="330" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Background="{StaticResource PanelBrush}"
+                    BorderBrush="{StaticResource BorderBrushCool}"
+                    BorderThickness="1"
+                    CornerRadius="6">
+                <ListBox x:Name="ResultsList"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Foreground="{StaticResource TextBrush}"
+                         MouseDoubleClick="ResultsList_MouseDoubleClick"
+                         SelectionChanged="ResultsList_SelectionChanged"
+                         ScrollViewer.CanContentScroll="True"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         VirtualizingPanel.IsVirtualizing="True"
+                         VirtualizingPanel.VirtualizationMode="Recycling"
+                         VirtualizingPanel.ScrollUnit="Pixel"
+                         VirtualizingPanel.CacheLength="1,1"
+                         VirtualizingPanel.CacheLengthUnit="Page">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="10,8" />
+                            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Row"
+                                                Background="Transparent"
+                                                BorderBrush="#223149"
+                                                BorderThickness="0,0,0,1">
+                                            <ContentPresenter Margin="{TemplateBinding Padding}" />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Row" Property="Background" Value="#D8E1EA" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Row" Property="Background" Value="#B9CDDE" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type models:CardSummary}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Name}"
+                                           TextTrimming="CharacterEllipsis"
+                                           FontSize="14" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding Id}"
+                                           Margin="12,0,0,0"
+                                           Foreground="{StaticResource MutedTextBrush}"
+                                           FontSize="13" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+
+            <Border Grid.Column="2"
+                    Background="{StaticResource PanelAltBrush}"
+                    BorderBrush="{StaticResource BorderBrushCool}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    ClipToBounds="True">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0" Margin="6">
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                            <Button x:Name="PreviewBackButton"
+                                    Content="‹"
+                                    Width="36"
+                                    MinHeight="28"
+                                    Click="PreviewBackButton_Click" />
+                            <Button x:Name="PreviewForwardButton"
+                                    Content="›"
+                                    Width="36"
+                                    MinHeight="28"
+                                    Margin="6,0,0,0"
+                                    Click="PreviewForwardButton_Click" />
+                        </StackPanel>
+                        <TextBlock x:Name="PreviewHistoryText"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right"
+                                   Foreground="{StaticResource MutedTextBrush}" />
+                    </DockPanel>
+                    <Grid Grid.Row="1">
+                    <wv2:WebView2 x:Name="PreviewBrowser"
+                                  Visibility="Collapsed" />
+                    <Image x:Name="PreviewImage"
+                           Stretch="Uniform"
+                           Visibility="Collapsed" />
+                    <TextBlock x:Name="PreviewText"
+                               Text="请选择一张卡"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Foreground="{StaticResource MutedTextBrush}"
+                               FontSize="16" />
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <TextBlock x:Name="StatusText"
+                   Grid.Row="4"
+                   Foreground="{StaticResource MutedTextBrush}"
+                   Text="正在检查资源..." />
+    </Grid>
+</Window>

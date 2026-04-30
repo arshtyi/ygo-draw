@@ -1,0 +1,10 @@
+[project]
+name = "asset-scripts"
+version = "0.1.0"
+description = "Utility scripts for asset preparation and data ingestion"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "Pillow>=10.0.0",
+    "psycopg[binary]>=3.2.0",
+]

@@ -1,0 +1,81 @@
+<Window x:Class="ygo_draw.DownloadDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="下载资源"
+        Width="640"
+        Height="560"
+        MinWidth="560"
+        MinHeight="480"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="12" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="12" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="6" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="6" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Host" Foreground="{StaticResource MutedTextBrush}" />
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="Port" Foreground="{StaticResource MutedTextBrush}" />
+            <TextBlock Grid.Row="0" Grid.Column="4" Text="User" Foreground="{StaticResource MutedTextBrush}" />
+            <TextBox x:Name="HostBox" Grid.Row="2" Grid.Column="0" Text="localhost" />
+            <TextBox x:Name="PortBox" Grid.Row="2" Grid.Column="2" Text="5432" />
+            <TextBox x:Name="UserBox" Grid.Row="2" Grid.Column="4" Text="ygo_draw" />
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Password" Foreground="{StaticResource MutedTextBrush}" />
+            <TextBlock Grid.Row="4" Grid.Column="2" Text="Database" Foreground="{StaticResource MutedTextBrush}" />
+            <TextBlock Grid.Row="4" Grid.Column="4" Text="SSL Mode" Foreground="{StaticResource MutedTextBrush}" />
+            <PasswordBox x:Name="PasswordBox" Grid.Row="6" Grid.Column="0" />
+            <TextBox x:Name="DatabaseBox" Grid.Row="6" Grid.Column="2" Text="ygo_draw_db" />
+            <TextBox x:Name="SslModeBox" Grid.Row="6" Grid.Column="4" Text="prefer" />
+        </Grid>
+
+        <Border Grid.Row="2"
+                Background="{StaticResource PanelAltBrush}"
+                BorderBrush="{StaticResource BorderBrushCool}"
+                BorderThickness="1"
+                CornerRadius="6">
+            <TextBox x:Name="LogBox"
+                     Background="#FFFFFF"
+                     BorderThickness="0"
+                     Foreground="{StaticResource TextBrush}"
+                     FontFamily="Consolas"
+                     FontSize="12"
+                     IsReadOnly="True"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     VerticalScrollBarVisibility="Auto" />
+        </Border>
+
+        <DockPanel Grid.Row="4">
+            <ProgressBar x:Name="Progress"
+                         Height="8"
+                         IsIndeterminate="False"
+                         DockPanel.Dock="Top"
+                         Margin="0,0,0,12" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="StartButton" Content="开始" Width="90" Click="StartButton_Click" />
+                <Button Content="关闭" Width="90" Margin="8,0,0,0" Click="CloseButton_Click" />
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

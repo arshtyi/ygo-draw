@@ -1,0 +1,56 @@
+<Window x:Class="ygo_draw.ExportDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="导出"
+        Width="680"
+        Height="300"
+        MinWidth="620"
+        MinHeight="280"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <RadioButton x:Name="CurrentRadio"
+                         Content="导出目前预览的这张"
+                         IsChecked="True"
+                         Margin="0,0,0,10" />
+            <RadioButton x:Name="HistoryRadio"
+                         Content="导出本次会话全部预览历史"
+                         Margin="0,0,0,10" />
+            <RadioButton x:Name="ListRadio"
+                         Content="导出当前搜索列表全部"
+                         Margin="0,0,0,18" />
+            <TextBlock Text="Output folder"
+                       Foreground="{StaticResource MutedTextBrush}"
+                       Margin="0,0,0,4" />
+            <DockPanel>
+                <Button Content="选择"
+                        DockPanel.Dock="Right"
+                        Width="86"
+                        Margin="10,0,0,0"
+                        Click="BrowseButton_Click" />
+                <TextBox x:Name="OutputBox"
+                         IsReadOnly="True"
+                         TextWrapping="NoWrap"
+                         HorizontalScrollBarVisibility="Auto" />
+            </DockPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <Button Content="导出"
+                    Width="86"
+                    Click="ExportButton_Click" />
+            <Button Content="取消"
+                    Width="86"
+                    Margin="8,0,0,0"
+                    Click="CancelButton_Click" />
+        </StackPanel>
+    </Grid>
+</Window>
