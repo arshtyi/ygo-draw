@@ -1,8 +1,6 @@
-# ygo draw (sdu database system experiment 3)
+# ygo draw
 
 a simple application to draw cards in the Yu-Gi-Oh! trading card game.
-
-> It happens to be the third part of the sdu database system course experiment.
 
 ## Note
 
@@ -21,19 +19,19 @@ a simple application to draw cards in the Yu-Gi-Oh! trading card game.
 <table>
     <tbody>
         <tr>
-            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-1.png" alt="1" style="width:100%;max-width:240px;height:auto;" /></td>
-            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-2.png" alt="2" style="width:100%;max-width:240px;height:auto;" /></td>
-            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-3.png" alt="3" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-01.png" alt="1" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-02.png" alt="2" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-03.png" alt="3" style="width:100%;max-width:240px;height:auto;" /></td>
         </tr>
         <tr>
-            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-4.png" alt="4" style="width:100%;max-width:240px;height:auto;" /></td>
-            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-5.png" alt="5" style="width:100%;max-width:240px;height:auto;" /></td>
-            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-6.png" alt="6" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-04.png" alt="4" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-05.png" alt="5" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-06.png" alt="6" style="width:100%;max-width:240px;height:auto;" /></td>
         </tr>
         <tr>
-            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-7.png" alt="7" style="width:100%;max-width:240px;height:auto;" /></td>
-            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-8.png" alt="8" style="width:100%;max-width:240px;height:auto;" /></td>
-            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-9.png" alt="9" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-07.png" alt="7" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-08.png" alt="8" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-09.png" alt="9" style="width:100%;max-width:240px;height:auto;" /></td>
         </tr>
     </tbody>
 </table>
@@ -49,6 +47,6 @@ The upstreams are following, more info can be found in the project itself:
 - Card assets: [arshtyi/YuGiOh-Cards-Asset](https://github.com/arshtyi/YuGiOh-Cards-Asset)
 - Typst template: [arshtyi/typst-ygo](https://github.com/arshtyi/typst-ygo)
 
-## Build
+## Usage
 
-If you have this idea, I think you do not need any instructions.
+If you want to do this, I think you do not need any instructions.

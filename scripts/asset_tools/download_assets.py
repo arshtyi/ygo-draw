@@ -273,8 +273,8 @@ def safe_extract_zip_strip_root(archive_path: Path, destination_dir: Path) -> No
 
 def ensure_typst_ygo_package(path_config: PathConfig) -> None:
     package_entrypoint = path_config.typst_ygo_target_dir / "lib" / "mod.typ"
-    package_manifest = path_config.typst_ygo_target_dir / "typst.toml"
-    if package_entrypoint.exists() and package_manifest.exists():
+    package_types = path_config.typst_ygo_target_dir / "lib" / "card" / "types.typ"
+    if package_entrypoint.exists() and package_types.exists():
         LOGGER.info("typst-ygo package is already available: %s", path_config.typst_ygo_target_dir)
         return
 

@@ -20,7 +20,7 @@ public sealed class ResourceIntegrityService(ProjectPaths paths)
         }
 
         if (!File.Exists(Path.Combine(paths.TypstYgoRoot, "lib", "mod.typ")) ||
-            !File.Exists(Path.Combine(paths.TypstYgoRoot, "typst.toml")))
+            !File.Exists(Path.Combine(paths.TypstYgoRoot, "lib", "card", "types.typ")))
         {
             failures.Add("assets/typst-ygo 不存在或不完整");
         }
