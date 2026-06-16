@@ -7,11 +7,12 @@ def project_root() -> Path:
 
 def card_template_dir(root: Path | None = None) -> Path:
     root = root or project_root()
-    return root / "assets" / "card_templates"
+    return root / "assets"
 
 
-def card_image_dir(root: Path | None = None) -> Path:
-    return card_template_dir(root) / "images"
+def card_image_dir(series: str, root: Path | None = None) -> Path:
+    root = root or project_root()
+    return root / "assets" / series / "images"
 
 
 def download_cache_dir(root: Path | None = None) -> Path:

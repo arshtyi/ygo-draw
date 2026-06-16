@@ -86,8 +86,11 @@ public sealed class TinymistPreviewService(ProjectPaths paths) : IDisposable
         startInfo.ArgumentList.Add(command);
         startInfo.ArgumentList.Add("--root");
         startInfo.ArgumentList.Add(paths.ProjectRoot);
-        startInfo.ArgumentList.Add("--font-path");
-        startInfo.ArgumentList.Add(Path.Combine(paths.TemplateRoot, "font"));
+        foreach (var fontPath in paths.TypstFontPaths)
+        {
+            startInfo.ArgumentList.Add("--font-path");
+            startInfo.ArgumentList.Add(fontPath);
+        }
         foreach (var (key, value) in inputs)
         {
             startInfo.ArgumentList.Add("--input");

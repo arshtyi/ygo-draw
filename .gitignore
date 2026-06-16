@@ -2,6 +2,7 @@
 .cache/
 assets/
 exports/
+lib/
 
 # Python
 .venv/

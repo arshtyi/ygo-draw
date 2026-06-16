@@ -21,27 +21,33 @@ public sealed class CardCatalogService(DatabaseConnectionSettings connectionSett
         await connection.OpenAsync(cancellationToken);
 
         await using var command = new NpgsqlCommand(
-            "SELECT id, name, payload FROM ygo_cards ORDER BY name, id",
+            "SELECT series, id, name, image, payload FROM ygo_cards ORDER BY series, name, id",
             connection);
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
         while (await reader.ReadAsync(cancellationToken))
         {
-            var id = reader.GetInt64(0).ToString();
-            var name = reader.GetString(1);
-            var payload = ReadPayload(reader.GetString(2));
+            var series = reader.GetString(0);
+            var id = reader.GetInt64(1).ToString();
+            var name = reader.GetString(2);
+            var imageId = reader.GetInt64(3).ToString();
+            var payload = ReadPayload(reader.GetString(4));
 
             if (!string.IsNullOrWhiteSpace(name))
             {
-                var summary = new CardSummary(id, name, payload);
+                var summary = new CardSummary(series, id, name, imageId, payload);
                 _cards.Add(summary);
                 _searchIndex.Add(new CardSearchEntry(
                     summary,
-                    BuildSearchText(payload.Values),
+                    BuildSearchText(payload.Values
+                        .Append(summary.Series)
+                        .Append(summary.SeriesLabel)),
                     NormalizeSearchText(name),
                     NormalizeSearchText(id),
-                    NormalizeSearchText(payload.GetValueOrDefault("cardImage") ?? id),
-                    NormalizeSearchText(payload.GetValueOrDefault("typeline") ?? string.Empty)));
+                    NormalizeSearchText(imageId),
+                    NormalizeSearchText(series),
+                    NormalizeSearchText(summary.SeriesLabel),
+                    NormalizeSearchText(payload.GetValueOrDefault("type") ?? string.Empty)));
             }
         }
     }
@@ -215,6 +221,11 @@ public sealed class CardCatalogService(DatabaseConnectionSettings connectionSett
                 score += 9_000;
             }
 
+            if (entry.SeriesText == normalizedQuery || entry.SeriesLabelText == normalizedQuery)
+            {
+                score += 3_000;
+            }
+
             if (entry.NameText.StartsWith(normalizedQuery, StringComparison.Ordinal))
             {
                 score += 4_000;
@@ -250,6 +261,11 @@ public sealed class CardCatalogService(DatabaseConnectionSettings connectionSett
             if (entry.IdText == token || entry.CardImageText == token)
             {
                 score += 1_000;
+            }
+
+            if (entry.SeriesText == token || entry.SeriesLabelText.Contains(token, StringComparison.Ordinal))
+            {
+                score += 500;
             }
 
             if (entry.TypeLineText.Contains(token, StringComparison.Ordinal))
@@ -292,6 +308,8 @@ public sealed class CardCatalogService(DatabaseConnectionSettings connectionSett
         string NameText,
         string IdText,
         string CardImageText,
+        string SeriesText,
+        string SeriesLabelText,
         string TypeLineText);
 
     private sealed record SearchResult(CardSearchEntry Entry, int Index, int Score);

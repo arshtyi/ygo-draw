@@ -5,23 +5,24 @@ namespace ygo_draw.services;
 public sealed class CardImageService(ProjectPaths paths, ProcessService processService)
 {
     public async Task EnsureCenterImageAsync(
+        string series,
         string cardImage,
         Action<string> log,
         CancellationToken cancellationToken = default)
     {
-        var imageDirectory = Path.Combine(paths.TemplateRoot, "images");
+        var imageDirectory = Path.Combine(paths.AssetsRoot, series, "images");
         Directory.CreateDirectory(imageDirectory);
 
-        var pngPath = Path.Combine(imageDirectory, $"{cardImage}.png");
-        if (File.Exists(pngPath))
+        var jpgPath = Path.Combine(imageDirectory, $"{cardImage}.jpg");
+        if (File.Exists(jpgPath))
         {
             return;
         }
 
-        log($"准备中心图: {cardImage}");
+        log($"准备中心图: {series}/{cardImage}");
         var command = await BuildPythonAssetCommandAsync(
             "prepare_card_image.py",
-            [cardImage, "--project-root", paths.ProjectRoot],
+            [series, cardImage, "--project-root", paths.ProjectRoot],
             cancellationToken);
         var code = await processService.RunAsync(
             command.FileName,
@@ -30,7 +31,7 @@ public sealed class CardImageService(ProjectPaths paths, ProcessService processS
             log,
             cancellationToken);
 
-        if (code != 0 || !File.Exists(pngPath))
+        if (code != 0 || !File.Exists(jpgPath))
         {
             throw new InvalidOperationException($"中心图准备失败，退出码: {code}");
         }
