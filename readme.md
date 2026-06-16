@@ -9,8 +9,8 @@ a simple application to draw cards in the Yu-Gi-Oh! trading card game.
 
 ## Features
 
-- Download prepared card data and card templates from upstream.
-- Search for cards.
+- Download prepared OT/RD assets and card data from upstream.
+- Search for OCG/TCG and Rush Duel cards.
 - Render and preview cards (support switching between current session history).
 - Export card images (support exporting current card, session history, search list).
 
@@ -33,19 +33,31 @@ a simple application to draw cards in the Yu-Gi-Oh! trading card game.
             <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-08.png" alt="8" style="width:100%;max-width:240px;height:auto;" /></td>
             <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-09.png" alt="9" style="width:100%;max-width:240px;height:auto;" /></td>
         </tr>
+        <tr>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-10.png" alt="1" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-11.png" alt="2" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-12.png" alt="3" style="width:100%;max-width:240px;height:auto;" /></td>
+        </tr>
+        <tr>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-13.png" alt="1" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-14.png" alt="2" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-15.png" alt="3" style="width:100%;max-width:240px;height:auto;" /></td>
+        </tr>
+        <tr>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-16.png" alt="1" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-17.png" alt="2" style="width:100%;max-width:240px;height:auto;" /></td>
+            <td width="33%"><img src="https://raw.githubusercontent.com/arshtyi/typst-ygo/main/template/card-18.png" alt="3" style="width:100%;max-width:240px;height:auto;" /></td>
+        </tr>
     </tbody>
 </table>
 
 ## Upstream
 
-The upstreams are following, more info can be found in the project itself:
-
-- Token info: [arshtyi/YuGiOh-Tokens](https://github.com/arshtyi/YuGiOh-Tokens)
-- Card types: [arshtyi/Translations-Of-YuGiOh-Cards-Type](https://github.com/arshtyi/Translations-Of-YuGiOh-Cards-Type)
-- Forbidden and limited list: [arshtyi/YuGiOh-Forbidden-And-Limited-List](https://github.com/arshtyi/YuGiOh-Forbidden-And-Limited-List)
-- Card templates: [arshtyi/Card-Templates-Of-YuGiOh](https://github.com/arshtyi/Card-Templates-Of-YuGiOh)
-- Card assets: [arshtyi/YuGiOh-Cards-Asset](https://github.com/arshtyi/YuGiOh-Cards-Asset)
+- Static assets: [arshtyi/ygo-assets](https://github.com/arshtyi/ygo-assets)
+- Card data: [arshtyi/ygo-cards](https://github.com/arshtyi/ygo-cards)
 - Typst template: [arshtyi/typst-ygo](https://github.com/arshtyi/typst-ygo)
+
+Runtime resources are laid out like `typst-ygo`.
 
 ## Usage
 

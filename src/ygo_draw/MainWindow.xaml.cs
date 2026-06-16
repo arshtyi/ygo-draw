@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -11,6 +12,12 @@ namespace ygo_draw;
 
 public partial class MainWindow : Window
 {
+    private const double CardAspectRatio = 59.0 / 86.0;
+    private const double MinMeasuredCardAspectRatio = 0.55;
+    private const double MaxMeasuredCardAspectRatio = 0.85;
+    private const double ContentColumnGap = 12.0;
+    private const double PreviewZoom = 1;
+
     private readonly ProjectPaths _paths = new();
     private readonly ProcessService _processService = new();
     private readonly DatabaseConnectionSettings _databaseSettings = new();
@@ -23,6 +30,8 @@ public partial class MainWindow : Window
     private CardCatalogService _catalog = null!;
     private ResourceIntegrityService _integrity = null!;
     private CardRenderService _renderer = null!;
+    private bool _isApplyingPreviewColumnWidth;
+    private double _previewContentAspectRatio = CardAspectRatio;
 
     public MainWindow()
     {
@@ -142,11 +151,14 @@ public partial class MainWindow : Window
             PreviewText.Visibility = Visibility.Collapsed;
             PreviewBrowser.Visibility = Visibility.Visible;
             await PreviewBrowser.EnsureCoreWebView2Async();
-            PreviewBrowser.ZoomFactor = 0.42;
+            PreviewBrowser.ZoomFactor = PreviewZoom;
             await Task.Delay(350);
             PreviewBrowser.CoreWebView2.Navigate(TinymistPreviewService.PreviewUrl);
             await Task.Delay(700);
-            PreviewBrowser.ZoomFactor = 0.42;
+            PreviewBrowser.ZoomFactor = PreviewZoom;
+            await ApplyPreviewPageChromeFixAsync();
+            await TryUpdatePreviewContentAspectRatioAsync();
+            UpdatePreviewColumnWidth();
             StatusText.Text = $"已启动预览 {card.Name}";
             if (addToHistory && !_isApplyingHistorySelection)
             {
@@ -166,11 +178,150 @@ public partial class MainWindow : Window
         }
     }
 
+    private async Task ApplyPreviewPageChromeFixAsync()
+    {
+        if (PreviewBrowser.CoreWebView2 is null)
+        {
+            return;
+        }
+
+        const string script = """
+            (() => {
+                let style = document.getElementById("ygo-draw-preview-fit");
+                if (!style) {
+                    style = document.createElement("style");
+                    style.id = "ygo-draw-preview-fit";
+                    document.head.appendChild(style);
+                }
+                style.textContent = `
+                    html, body {
+                        margin: 0 !important;
+                        padding: 0 !important;
+                    }
+                `;
+                window.scrollTo(0, 0);
+            })();
+            """;
+        await PreviewBrowser.CoreWebView2.ExecuteScriptAsync(script);
+    }
+
+    private async Task TryUpdatePreviewContentAspectRatioAsync()
+    {
+        if (PreviewBrowser.CoreWebView2 is null)
+        {
+            return;
+        }
+
+        const string script = """
+            (() => {
+                const rectOf = node => {
+                    const rect = node.getBoundingClientRect();
+                    return {
+                        width: rect.width,
+                        height: rect.height,
+                        ratio: rect.width / Math.max(rect.height, 1),
+                        area: rect.width * rect.height
+                    };
+                };
+                const explicitNodes = Array.from(document.querySelectorAll(
+                    "svg, canvas, img, .typst-page, [data-page]"
+                ));
+                const explicit = explicitNodes
+                    .map(rectOf)
+                    .filter(item => item.width > 40 && item.height > 40)
+                    .filter(item => item.ratio > 0.5 && item.ratio < 0.9)
+                    .sort((left, right) => right.area - left.area);
+                const fallback = Array.from(document.body.children)
+                    .map(rectOf)
+                    .filter(item => item.width > 40 && item.height > 40)
+                    .filter(item => item.ratio > 0.5 && item.ratio < 0.9)
+                    .sort((left, right) => right.area - left.area);
+                const item = explicit[0] || fallback[0];
+                if (item) {
+                    return { width: item.width, height: item.height };
+                }
+                const scroll = document.scrollingElement || document.documentElement;
+                return {
+                    width: scroll.scrollWidth,
+                    height: scroll.scrollHeight
+                };
+            })()
+            """;
+
+        try
+        {
+            var raw = await PreviewBrowser.CoreWebView2.ExecuteScriptAsync(script);
+            if (string.IsNullOrWhiteSpace(raw) || raw == "null")
+            {
+                return;
+            }
+
+            using var document = JsonDocument.Parse(raw);
+            var root = document.RootElement;
+            var width = root.GetProperty("width").GetDouble();
+            var height = root.GetProperty("height").GetDouble();
+            var aspectRatio = width / height;
+            if (aspectRatio is >= MinMeasuredCardAspectRatio and <= MaxMeasuredCardAspectRatio)
+            {
+                _previewContentAspectRatio = aspectRatio;
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private void MainContentGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        UpdatePreviewColumnWidth();
+    }
+
+    private void PreviewViewport_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        UpdatePreviewColumnWidth();
+    }
+
+    private void UpdatePreviewColumnWidth()
+    {
+        if (_isApplyingPreviewColumnWidth)
+        {
+            return;
+        }
+
+        var viewportHeight = PreviewViewport.ActualHeight;
+        var totalWidth = MainContentGrid.ActualWidth;
+        if (viewportHeight <= 0 || totalWidth <= 0)
+        {
+            return;
+        }
+
+        var maxPreviewWidth = Math.Max(
+            1.0,
+            totalWidth - ResultsColumn.MinWidth - ContentColumnGap);
+        var desiredPreviewWidth = Math.Ceiling(viewportHeight * _previewContentAspectRatio);
+        var previewWidth = Math.Min(desiredPreviewWidth, maxPreviewWidth);
+
+        if (Math.Abs(PreviewColumn.ActualWidth - previewWidth) < 0.5)
+        {
+            return;
+        }
+
+        try
+        {
+            _isApplyingPreviewColumnWidth = true;
+            PreviewColumn.Width = new GridLength(previewWidth, GridUnitType.Pixel);
+        }
+        finally
+        {
+            _isApplyingPreviewColumnWidth = false;
+        }
+    }
+
     private void AddPreviewHistory(CardSummary card)
     {
         if (_previewHistoryIndex >= 0 &&
             _previewHistoryIndex < _previewHistory.Count &&
-            _previewHistory[_previewHistoryIndex].Id == card.Id)
+            SameCard(_previewHistory[_previewHistoryIndex], card))
         {
             return;
         }
@@ -200,7 +351,7 @@ public partial class MainWindow : Window
         _isApplyingHistorySelection = true;
         var listItem = ResultsList.Items
             .OfType<CardSummary>()
-            .FirstOrDefault(item => item.Id == card.Id);
+            .FirstOrDefault(item => SameCard(item, card));
         if (listItem is not null)
         {
             ResultsList.SelectedItem = listItem;
@@ -250,7 +401,7 @@ public partial class MainWindow : Window
     {
         MessageBox.Show(
             this,
-            "ygo draw\nA database course project by the author.\n\nProject: https://github.com/arshtyi/ygo_draw",
+            "Project: https://github.com/arshtyi/ygo_draw\nMore: https://github.com/arshtyi/my-ygo",
             "关于",
             MessageBoxButton.OK,
             MessageBoxImage.Information);
@@ -294,12 +445,12 @@ public partial class MainWindow : Window
                     ? [selected]
                     : [],
             ExportScope.History => _previewHistory
-                .GroupBy(card => card.Id)
+                .GroupBy(CardIdentity)
                 .Select(group => group.Last())
                 .ToList(),
             ExportScope.List => ResultsList.Items
                 .OfType<CardSummary>()
-                .GroupBy(card => card.Id)
+                .GroupBy(CardIdentity)
                 .Select(group => group.First())
                 .ToList(),
             _ => []
@@ -360,7 +511,7 @@ public partial class MainWindow : Window
     {
         var result = MessageBox.Show(
             this,
-            "This will delete .cache/ and assets/. Downloaded resources, generated previews, card images, and typst-ygo will be removed.",
+            "This will delete .cache/, assets/, and lib/. Downloaded resources, generated previews, card images, and typst-ygo code will be removed.",
             "Confirm cleanup",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -386,6 +537,7 @@ public partial class MainWindow : Window
             {
                 DeleteDirectoryIfExists(_paths.CacheRoot);
                 DeleteDirectoryIfExists(_paths.AssetsRoot);
+                DeleteDirectoryIfExists(_paths.TypstLibRoot);
                 Directory.CreateDirectory(_paths.CacheRoot);
                 Directory.CreateDirectory(_paths.AssetsRoot);
             });
@@ -424,5 +576,16 @@ public partial class MainWindow : Window
         var imageService = new CardImageService(_paths, _processService);
         var previewService = new TinymistPreviewService(_paths);
         return new CardRenderService(_paths, _processService, imageService, previewService);
+    }
+
+    private static string CardIdentity(CardSummary card)
+    {
+        return $"{card.Series}:{card.Id}";
+    }
+
+    private static bool SameCard(CardSummary left, CardSummary right)
+    {
+        return string.Equals(left.Series, right.Series, StringComparison.Ordinal) &&
+               string.Equals(left.Id, right.Id, StringComparison.Ordinal);
     }
 }

@@ -6,16 +6,9 @@ from urllib.request import urlopen
 from asset_paths import card_image_dir, project_root
 from download_common import DOWNLOAD_TIMEOUT_SECONDS
 
-try:
-    from PIL import Image, ImageOps
-except ImportError as exc:
-    raise SystemExit(
-        "Pillow is required for card image conversion. "
-        "Install it with: python -m pip install Pillow"
-    ) from exc
-
 
 IMAGE_URL_TEMPLATE = "https://images.ygoprodeck.com/images/cards_cropped/{card_image}.jpg"
+SUPPORTED_SERIES = ("ot", "rd")
 
 
 def build_project_root() -> Path:
@@ -24,9 +17,10 @@ def build_project_root() -> Path:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Download a cropped Yu-Gi-Oh card image and convert it to PNG for typst-ygo."
+        description="Download a cropped Yu-Gi-Oh card image for typst-ygo."
     )
-    parser.add_argument("card_image", help="YGOPRODeck cropped card image id")
+    parser.add_argument("series", choices=SUPPORTED_SERIES, help="Card series: ot or rd")
+    parser.add_argument("card_image", help="Card image id")
     parser.add_argument(
         "--project-root",
         default=None,
@@ -43,39 +37,31 @@ def download_bytes(url: str) -> bytes:
         return response.read()
 
 
-def prepare_card_image(card_image: str, project_root: Path) -> Path:
-    image_dir = card_image_dir(project_root)
+def prepare_card_image(series: str, card_image: str, root: Path) -> Path:
+    image_dir = card_image_dir(series, root)
     image_dir.mkdir(parents=True, exist_ok=True)
 
-    png_path = image_dir / f"{card_image}.png"
-    if png_path.exists():
-        print(f"Using cached PNG: {png_path}")
-        return png_path
-
     jpg_path = image_dir / f"{card_image}.jpg"
-    if not jpg_path.exists():
-        url = IMAGE_URL_TEMPLATE.format(card_image=card_image)
-        print(f"Downloading {url} -> {jpg_path}")
-        jpg_path.write_bytes(download_bytes(url))
+    if jpg_path.exists():
+        print(f"Using cached image: {jpg_path}")
+        return jpg_path
 
-    print(f"Converting {jpg_path} -> {png_path}")
-    with Image.open(jpg_path) as image:
-        image = ImageOps.exif_transpose(image)
-        if image.mode not in ("RGB", "RGBA"):
-            image = image.convert("RGBA" if "A" in image.getbands() else "RGB")
-        image.save(png_path, format="PNG", optimize=True)
-
-    jpg_path.unlink(missing_ok=True)
-    return png_path
+    url = IMAGE_URL_TEMPLATE.format(card_image=card_image)
+    print(f"Downloading {url} -> {jpg_path}")
+    jpg_path.write_bytes(download_bytes(url))
+    return jpg_path
 
 
 def main() -> int:
     args = parse_args()
-    project_root = Path(args.project_root).resolve() if args.project_root else build_project_root()
+    root = Path(args.project_root).resolve() if args.project_root else build_project_root()
     try:
-        prepare_card_image(str(args.card_image), project_root)
+        prepare_card_image(args.series, str(args.card_image), root)
     except Exception as exc:
-        print(f"Failed to prepare card image {args.card_image}: {exc}", file=sys.stderr)
+        print(
+            f"Failed to prepare card image {args.series}/{args.card_image}: {exc}",
+            file=sys.stderr,
+        )
         return 1
     return 0
 

@@ -11,48 +11,59 @@ public sealed class ProjectPaths
         CacheRoot = Path.Combine(ProjectRoot, ".cache");
         AssetsRoot = Path.Combine(ProjectRoot, "assets");
         CacheDownloads = Path.Combine(CacheRoot, "downloads");
-        AssetsCardsJson = Path.Combine(AssetsRoot, "cards", "cards.json");
-        TemplateArchive = Path.Combine(CacheDownloads, "yugioh-card-template.tar.xz");
-        TemplateSha256 = Path.Combine(CacheDownloads, "yugioh-card-template.tar.xz.sha256");
-        CardsCacheJson = Path.Combine(CacheDownloads, "cards.json");
-        CardsSha256 = Path.Combine(CacheDownloads, "cards.json.sha256");
-        TemplateRoot = Path.Combine(AssetsRoot, "card_templates");
-        TypstYgoRoot = Path.Combine(AssetsRoot, "typst-ygo");
+        OtAssetsRoot = Path.Combine(AssetsRoot, "ot");
+        RdAssetsRoot = Path.Combine(AssetsRoot, "rd");
+        OtCardsJson = Path.Combine(OtAssetsRoot, "card", "ot.json");
+        RdCardsJson = Path.Combine(RdAssetsRoot, "card", "rd.json");
+        TypstLibRoot = Path.Combine(ProjectRoot, "lib");
         PreviewTemplatePath = Path.Combine(ProjectRoot, "src", "ygo_draw", "templates", "card-preview.typ");
         AppIconPath = Path.Combine(ProjectRoot, "public", "icons", "ygo_draw.png");
-        TemplateMarker = Path.Combine(TemplateRoot, ".template_archive.sha256");
         AssetToolsDir = Path.Combine(ProjectRoot, "scripts", "asset_tools");
         DownloadScript = Path.Combine(AssetToolsDir, "download_assets.py");
         GuiStatePath = Path.Combine(ProjectRoot, ".cache", "gui_state.json");
 
         Directory.CreateDirectory(CacheDownloads);
         Directory.CreateDirectory(AssetsRoot);
-        Directory.CreateDirectory(Path.GetDirectoryName(AssetsCardsJson)!);
+        Directory.CreateDirectory(Path.GetDirectoryName(OtCardsJson)!);
+        Directory.CreateDirectory(Path.GetDirectoryName(RdCardsJson)!);
     }
 
     public string ProjectRoot { get; }
     public string CacheRoot { get; }
     public string AssetsRoot { get; }
     public string CacheDownloads { get; }
-    public string AssetsCardsJson { get; }
-    public string TemplateArchive { get; }
-    public string TemplateSha256 { get; }
-    public string CardsCacheJson { get; }
-    public string CardsSha256 { get; }
-    public string TemplateRoot { get; }
-    public string TypstYgoRoot { get; }
+    public string OtAssetsRoot { get; }
+    public string RdAssetsRoot { get; }
+    public string OtCardsJson { get; }
+    public string RdCardsJson { get; }
+    public string TypstLibRoot { get; }
     public string PreviewTemplatePath { get; }
     public string AppIconPath { get; }
-    public string TemplateMarker { get; }
     public string AssetToolsDir { get; }
     public string DownloadScript { get; }
     public string GuiStatePath { get; }
 
-    public string[] RequiredTemplateFiles =>
+    public string[] TypstFontPaths =>
     [
-        Path.Combine(TemplateRoot, "figure", "cards", "card-effect.png"),
-        Path.Combine(TemplateRoot, "figure", "attributes", "attribute-light.png"),
-        Path.Combine(TemplateRoot, "font", "sc", "Yu-Gi-Oh! DFKaiW5-A（简体中文）.ttf")
+        Path.Combine(OtAssetsRoot, "font"),
+        Path.Combine(RdAssetsRoot, "font")
+    ];
+
+    public string[] RequiredAssetFiles =>
+    [
+        Path.Combine(OtAssetsRoot, "frame", "effect.png"),
+        Path.Combine(OtAssetsRoot, "attribute", "light.png"),
+        Path.Combine(OtAssetsRoot, "font", "YGO_Card_JP.ttf"),
+        Path.Combine(RdAssetsRoot, "frame", "effect.png"),
+        Path.Combine(RdAssetsRoot, "attribute", "light.png"),
+        Path.Combine(RdAssetsRoot, "font", "YGO_Card_JP.ttf")
+    ];
+
+    public string[] RequiredTypstFiles =>
+    [
+        Path.Combine(TypstLibRoot, "mod.typ"),
+        Path.Combine(TypstLibRoot, "ot", "data.typ"),
+        Path.Combine(TypstLibRoot, "rd", "data.typ")
     ];
 
     private static string FindProjectRoot(string start)

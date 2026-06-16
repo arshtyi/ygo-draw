@@ -18,6 +18,7 @@ public sealed class CardRenderService(
     {
         var inputs = TypstInputMapper.BuildInputs(card);
         await imageService.EnsureCenterImageAsync(
+            card.Series,
             TypstInputMapper.CardImage(card),
             log,
             cancellationToken);
@@ -39,6 +40,7 @@ public sealed class CardRenderService(
 
         var inputs = TypstInputMapper.BuildInputs(card);
         await imageService.EnsureCenterImageAsync(
+            card.Series,
             TypstInputMapper.CardImage(card),
             log,
             cancellationToken);
@@ -66,7 +68,7 @@ public sealed class CardRenderService(
     private static string BuildExportFileName(CardSummary card)
     {
         var invalidChars = Path.GetInvalidFileNameChars();
-        var raw = $"{card.Id}-{card.Name}";
+        var raw = $"{card.Series}-{card.Id}-{card.Name}";
         var builder = new StringBuilder(raw.Length);
         foreach (var ch in raw)
         {
